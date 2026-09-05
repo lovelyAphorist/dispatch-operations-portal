@@ -1,0 +1,91 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Self Dispatch Dashboard";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div>
+        <div class="eyebrow">SELF DISPATCH</div>
+        <h1 class="h2 mb-1">Dispatch Dashboard</h1>
+        <p class="text-secondary mb-0">Remote pagination, provider-scoped access, edit workflow, and field-level history.</p>
+    </div>
+    <a class="btn btn-primary" href="@Url.Action("CreateDispatch", "Dispatch", new { demoUserId = Model.SelectedDemoUserId })">New demo dispatch</a>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-lg-4">
+                <label class="form-label fw-semibold">Demo access profile</label>
+                <select id="demoUser" class="form-select">
+                    @foreach (var user in Model.DemoUsers)
+                    {
+                        if (user.Id == Model.SelectedDemoUserId)
+                        {
+                            <option value="@user.Id" selected>@user.DisplayName — @user.Role</option>
+                        }
+                        else
+                        {
+                            <option value="@user.Id">@user.DisplayName — @user.Role</option>
+                        }
+                    }
+                </select>
+                <div class="form-text">Visible scope: <strong>@Model.AccessSummary</strong></div>
+            </div>
+            <div class="col-lg-3">
+                <label class="form-label fw-semibold" for="search">Search</label>
+                <input id="search" class="form-control" placeholder="Reference or client name" />
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label fw-semibold" for="fromDate">From</label>
+                <input id="fromDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label fw-semibold" for="toDate">To</label>
+                <input id="toDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3 col-lg-1 d-grid">
+                <button id="applyFilters" class="btn btn-outline-secondary">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-card">
+    <div id="dispatch-table"></div>
+</div>
+
+<form id="deleteTokenForm" class="d-none">
+    @Html.AntiForgeryToken()
+</form>
+
+<div class="modal fade" id="historyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <div class="eyebrow">AUDIT HISTORY</div>
+                    <h2 class="modal-title fs-5" id="historyTitle">Dispatch history</h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="history-table"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    window.dispatchPortalConfig = {
+        demoUserId: @Model.SelectedDemoUserId,
+        dashboardUrl: '@Url.Action("Dashboard", "Dispatch")',
+        dataUrl: '@Url.Action("GetPaginatedSelfDispatches", "Dispatch")',
+        editUrl: '@Url.Action("EditDispatch", "Dispatch")',
+        historyUrl: '@Url.Action("GetDispatchHistory", "Dispatch")',
+        deleteBaseUrl: '@Url.Content("~/Dispatches/DeleteDispatch")'
+    };
+</script>
+<script src="~/js/dispatch-dashboard.js" asp-append-version="true"></script>
+}

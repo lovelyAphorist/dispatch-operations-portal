@@ -1,0 +1,61 @@
+:root {
+    --portal-bg: #f5f7fa;
+    --portal-ink: #18212f;
+    --portal-muted: #687386;
+}
+
+body {
+    background: var(--portal-bg);
+    color: var(--portal-ink);
+}
+
+.portal-shell {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+.eyebrow {
+    font-size: .72rem;
+    letter-spacing: .16em;
+    font-weight: 700;
+    color: var(--portal-muted);
+    margin-bottom: .35rem;
+}
+
+.table-card {
+    background: #fff;
+    border-radius: .75rem;
+    box-shadow: 0 .25rem 1.25rem rgba(24, 33, 47, .08);
+    overflow: hidden;
+}
+
+.section-title {
+    font-weight: 700;
+    font-size: 1rem;
+    padding-bottom: .5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #e6eaf0;
+}
+
+.form-check-wrap {
+    display: flex;
+    gap: .55rem;
+    align-items: center;
+    min-height: 38px;
+}
+
+.followup-row {
+    background: #f8fafc;
+    border: 1px solid #e5eaf0;
+    border-radius: .65rem;
+    padding: .75rem;
+}
+
+.tabulator {
+    border: 0;
+    font-size: .92rem;
+}
+
+.tabulator .tabulator-header {
+    border-bottom: 1px solid #dfe5ec;
+}

@@ -1,0 +1,170 @@
+@using ColoradoDispatchPortal.Data.Entities
+@model SelfDispatchModel
+@{
+    var isCreate = (bool)(ViewBag.IsCreate ?? false);
+    var demoUserId = (int)(ViewBag.DemoUserId ?? 1);
+    var providers = (IReadOnlyList<Provider>)(ViewBag.Providers ?? Array.Empty<Provider>());
+    ViewData["Title"] = isCreate ? "Create Dispatch" : "Edit Dispatch";
+    var formAction = isCreate ? "CreateDispatch" : "UpdateDispatch";
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <div class="eyebrow">SELF DISPATCH</div>
+        <h1 class="h2 mb-1">@(isCreate ? "Create demo dispatch" : $"Edit {Model.ReferenceNumber}")</h1>
+        <p class="text-secondary mb-0">Changes to incomplete dispatches are recorded in field-level audit history.</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="@Url.Action("Dashboard", "Dispatch", new { demoUserId })">Back to dashboard</a>
+</div>
+
+@if (!isCreate && Model.IsComplete)
+{
+    <div class="alert alert-warning">This dispatch is complete and is read-only, matching the recovered portal workflow.</div>
+}
+
+<form id="dispatchForm" method="post" action="@Url.Action(formAction, "Dispatch", new { demoUserId })" class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        @Html.AntiForgeryToken()
+        <input asp-for="Id" type="hidden" />
+        <input id="dashboardUrl" type="hidden" value="@Url.Action("Dashboard", "Dispatch", new { demoUserId })" />
+
+        <div class="section-title">Dispatch details</div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label asp-for="ReferenceNumber" class="form-label"></label>
+                <input asp-for="ReferenceNumber" class="form-control" required />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="FirstName" class="form-label"></label>
+                <input asp-for="FirstName" class="form-control" required />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="LastName" class="form-label"></label>
+                <input asp-for="LastName" class="form-control" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Provider</label>
+                <select asp-for="ProviderId" class="form-select" required>
+                    @foreach (var provider in providers)
+                    {
+                        <option value="@provider.Id">@provider.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="RespondingClinicianTeam" class="form-label"></label>
+                <input asp-for="RespondingClinicianTeam" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="ResponseLocation" class="form-label"></label>
+                <input asp-for="ResponseLocation" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="ReceivedDateTime" class="form-label"></label>
+                <input asp-for="ReceivedDateTime" type="datetime-local" class="form-control" value="@(Model.ReceivedDateTime?.ToString("yyyy-MM-ddTHH:mm"))" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="DispatchDateTime" class="form-label"></label>
+                <input asp-for="DispatchDateTime" type="datetime-local" class="form-control" value="@(Model.DispatchDateTime?.ToString("yyyy-MM-ddTHH:mm"))" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="ClearedFromOnSceneDateTime" class="form-label"></label>
+                <input asp-for="ClearedFromOnSceneDateTime" type="datetime-local" class="form-control" value="@(Model.ClearedFromOnSceneDateTime?.ToString("yyyy-MM-ddTHH:mm"))" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Disposition" class="form-label"></label>
+                <input asp-for="Disposition" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="CancellationType" class="form-label"></label>
+                <input asp-for="CancellationType" class="form-control" />
+            </div>
+        </div>
+
+        <div class="section-title">Behavioral health appointment</div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4 form-check-wrap"><input asp-for="BHAppointmentOffered" class="form-check-input" /><label asp-for="BHAppointmentOffered" class="form-check-label"></label></div>
+            <div class="col-md-4 form-check-wrap"><input asp-for="OfferedWithin7Days" class="form-check-input" /><label asp-for="OfferedWithin7Days" class="form-check-label"></label></div>
+            <div class="col-md-4 form-check-wrap"><input asp-for="AppointmentScheduled" class="form-check-input" /><label asp-for="AppointmentScheduled" class="form-check-label"></label></div>
+            <div class="col-md-4 form-check-wrap"><input asp-for="ScheduledWithin7Days" class="form-check-input" /><label asp-for="ScheduledWithin7Days" class="form-check-label"></label></div>
+            <div class="col-md-4 form-check-wrap"><input asp-for="FollowUpOffered" class="form-check-input" /><label asp-for="FollowUpOffered" class="form-check-label"></label></div>
+            <div class="col-md-4 form-check-wrap"><input asp-for="FiveDayFollowUpOffered" class="form-check-input" /><label asp-for="FiveDayFollowUpOffered" class="form-check-label"></label></div>
+            <div class="col-md-6">
+                <label asp-for="WhyNotBHAppointment" class="form-label"></label>
+                <textarea asp-for="WhyNotBHAppointment" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="WhyNotScheduled" class="form-label"></label>
+                <textarea asp-for="WhyNotScheduled" class="form-control" rows="2"></textarea>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center section-title">
+            <span>Follow-ups</span>
+            <button type="button" id="addFollowUp" class="btn btn-sm btn-outline-primary">Add follow-up</button>
+        </div>
+        <div id="followUps" class="vstack gap-3 mb-4">
+            @for (var i = 0; i < Model.FollowUps.Count; i++)
+            {
+                <div class="followup-row row g-2 align-items-end">
+                    <input type="hidden" name="FollowUps[@i].Id" value="@Model.FollowUps[i].Id" />
+                    <div class="col-md-3">
+                        <label class="form-label">Date / time</label>
+                        <input type="datetime-local" class="form-control" name="FollowUps[@i].DateTime" value="@(Model.FollowUps[i].DateTime?.ToString("yyyy-MM-ddTHH:mm"))" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Who</label>
+                        <input class="form-control" name="FollowUps[@i].Who" value="@Model.FollowUps[i].Who" />
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Outcome</label>
+                        <input class="form-control" name="FollowUps[@i].Outcome" value="@Model.FollowUps[i].Outcome" />
+                    </div>
+                    <div class="col-md-1 d-grid">
+                        <button type="button" class="btn btn-outline-danger remove-followup">Remove</button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="section-title">Five-day follow-up</div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label asp-for="FiveDayFollowUpDateTime" class="form-label"></label>
+                <input asp-for="FiveDayFollowUpDateTime" type="datetime-local" class="form-control" value="@(Model.FiveDayFollowUpDateTime?.ToString("yyyy-MM-ddTHH:mm"))" />
+            </div>
+            <div class="col-md-8">
+                <label asp-for="FiveDayFollowUpOutcome" class="form-label"></label>
+                <textarea asp-for="FiveDayFollowUpOutcome" class="form-control" rows="2"></textarea>
+            </div>
+        </div>
+
+        <div class="form-check mb-4">
+            <input asp-for="IsComplete" class="form-check-input" />
+            <label asp-for="IsComplete" class="form-check-label fw-semibold"></label>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <a class="btn btn-outline-secondary" href="@Url.Action("Dashboard", "Dispatch", new { demoUserId })">Cancel</a>
+            @if (!isCreate && Model.IsComplete)
+            {
+                <button id="submitButton" type="submit" class="btn btn-primary" disabled>Save changes</button>
+            }
+            else
+            {
+                <button id="submitButton" type="submit" class="btn btn-primary">@(isCreate ? "Create dispatch" : "Save changes")</button>
+            }
+        </div>
+    </div>
+</form>
+
+<div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h2 class="modal-title fs-5">Unable to save</h2><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><ul id="errorMessages" class="mb-0"></ul></div></div></div>
+</div>
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h2 class="modal-title fs-5">Saved</h2></div><div class="modal-body">The dispatch was saved successfully.</div></div></div>
+</div>
+
+@section Scripts {
+<script src="~/js/edit-dispatch.js" asp-append-version="true"></script>
+}

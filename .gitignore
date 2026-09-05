@@ -1,0 +1,17 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Local demo database
+*.db
+*.db-shm
+*.db-wal
+
+## OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
